@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { CreateSnippet, DeleteSnippet, GetSnippets } from "../wailsjs/go/main/App";
 
 function App() {
-    const [snippets, setSnippets] = useState<any[]>([]);
+    const [snippets, setSnippets] = useState<SnippetModel[]>([]);
     const [error, setError] = useState("");
 
     async function loadSnippets() {
-        const result: any[] = await GetSnippets();
+        const result: SnippetModel[] = await GetSnippets();
         console.log('loadsnippets::', result);
         setSnippets(result);
     }
@@ -37,7 +37,7 @@ function App() {
     async function deleteSnippet(id: string) {
         try {
             setError("");
-            const result: any = await DeleteSnippet(id);
+            await DeleteSnippet(id);
             await loadSnippets();
         } catch (err) {
             setError(err instanceof Error ? err.message : "No se pudo borrar el snippet");
