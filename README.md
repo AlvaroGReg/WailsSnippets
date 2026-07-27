@@ -2,10 +2,7 @@
 
 ## About
 
-This is the official Wails React-TS template.
-
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+Small desktop app to CRUD and copy to clipboard snippets easily. Just testing Wails trying to do something useful.
 
 ## Live Development
 

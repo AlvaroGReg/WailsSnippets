@@ -1,28 +1,54 @@
-import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
-import './App.css';
-import {Greet} from "../wailsjs/go/main/App";
+import { useEffect, useState } from "react";
+import { CreateSnippet, GetSnippets } from "../wailsjs/go/main/App";
 
 function App() {
-    const [resultText, setResultText] = useState("Please enter your name below 👇");
-    const [name, setName] = useState('');
-    const updateName = (e: any) => setName(e.target.value);
-    const updateResultText = (result: string) => setResultText(result);
+    const [snippets, setSnippets] = useState<any[]>([]);
+    const [error, setError] = useState("");
 
-    function greet() {
-        Greet(name).then(updateResultText);
+    async function loadSnippets() {
+        const result: any[] = await GetSnippets();
+        console.log('loadsnippets::', result);
+        setSnippets(result);
+    }
+
+    useEffect(() => {
+        loadSnippets();
+    }, []);
+
+    async function createExample() {
+        const newSnippet = {
+            title: "Titulo",
+            language: "TypeScript",
+            code: "console.log('Hola');",
+            tags: ["typescript", "ejemplo"],
+        }
+
+        console.log('createExample::', newSnippet);
+
+        try {
+            setError("");
+            await CreateSnippet(newSnippet);
+            await loadSnippets();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "No se pudo crear el snippet");
+        }
     }
 
     return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text"/>
-                <button className="btn" onClick={greet}>Greet</button>
-            </div>
-        </div>
-    )
+        <main>
+            <button onClick={createExample}>Crear snippet de ejemplo</button>
+
+            {error && <p>{error}</p>}
+
+            <ul>
+                {snippets.map((snippet) => (
+                    <li key={snippet.id}>
+                        {snippet.title} — {snippet.language}
+                    </li>
+                ))}
+            </ul>
+        </main>
+    );
 }
 
-export default App
+export default App;

@@ -2,17 +2,22 @@ package main
 
 import (
 	"context"
-	"fmt"
+
+	"WailsSnippets/internal/domain"
+	"WailsSnippets/internal/service"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx      context.Context
+	snippets *service.SnippetService
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	return &App{
+		snippets: service.NewSnippetService(),
+	}
 }
 
 // startup is called when the app starts. The context is saved
@@ -21,7 +26,10 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+func (a *App) GetSnippets() []domain.Snippet {
+	return a.snippets.List()
+}
+
+func (a *App) CreateSnippet(input domain.CreateSnippetInput) (domain.Snippet, error) {
+	return a.snippets.Create(input)
 }
