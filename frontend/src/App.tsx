@@ -1,66 +1,31 @@
-import { useEffect, useState } from "react";
-import { CreateSnippet, DeleteSnippet, GetSnippets } from "../wailsjs/go/main/App";
+import SnippetsTable from "./components/snippets-table";
+import { useSnippets } from "./hooks/use-snippets";
 
 function App() {
-    const [snippets, setSnippets] = useState<SnippetModel[]>([]);
-    const [error, setError] = useState("");
+    const { snippets, error, createSnippet, updateSnippet, deleteSnippet } = useSnippets();
 
-    async function loadSnippets() {
-        const result: SnippetModel[] = await GetSnippets();
-        console.log('loadsnippets::', result);
-        setSnippets(result);
-    }
-
-    useEffect(() => {
-        loadSnippets();
-    }, []);
-
-    async function createExample() {
+    function createExample() {
         const newSnippet = {
-            title: "Titulo",
+            title: "Sample title",
             language: "TypeScript",
-            code: "console.log('Hola');",
-            tags: ["typescript", "ejemplo"],
-        }
+            code: "console.log('Hello');",
+            tags: ["typescript", "sample"],
+        };
 
-        console.log('createExample::', newSnippet);
-
-        try {
-            setError("");
-            await CreateSnippet(newSnippet);
-            await loadSnippets();
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "No se pudo crear el snippet");
-        }
-    }
-
-    async function deleteSnippet(id: string) {
-        try {
-            setError("");
-            await DeleteSnippet(id);
-            await loadSnippets();
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "No se pudo borrar el snippet");
-        }
+        void createSnippet(newSnippet);
     }
 
     return (
         <main>
-            <button onClick={createExample}>Crear snippet de ejemplo</button>
+            <button onClick={createExample}>Create sample snippet</button>
 
             {error && <p>{error}</p>}
 
-            <ul>
-                {snippets.map((snippet) => (
-                    <li key={snippet.id}>
-                        <span>{snippet.title}</span>
-                        <span>{snippet.language}</span>
-                        <button onClick={ () => deleteSnippet(snippet.id)}>
-                            <span>Borrar</span>
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            <SnippetsTable
+                snippets={snippets}
+                onUpdate={updateSnippet}
+                onDelete={deleteSnippet}
+            />
         </main>
     );
 }
