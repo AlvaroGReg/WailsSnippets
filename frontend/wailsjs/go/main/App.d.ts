@@ -7,3 +7,5 @@ export function CreateSnippet(arg1:domain.CreateSnippetInput):Promise<domain.Sni
 export function DeleteSnippet(arg1:string):Promise<void>;
 
 export function GetSnippets():Promise<Array<domain.Snippet>>;
+
+export function UpdateSnippet(arg1:domain.Snippet):Promise<domain.Snippet>;

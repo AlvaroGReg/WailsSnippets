@@ -34,6 +34,10 @@ func (a *App) CreateSnippet(input domain.CreateSnippetInput) (domain.Snippet, er
 	return a.snippets.Create(input)
 }
 
+func (a *App) UpdateSnippet(snippet domain.Snippet) (domain.Snippet, error) {
+	return a.snippets.UpdateSnippet(snippet)
+}
+
 func (a *App) DeleteSnippet(id string) error {
 	return a.snippets.DeleteSnippet(id)
 }

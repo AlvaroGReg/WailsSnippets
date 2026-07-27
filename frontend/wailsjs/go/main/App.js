@@ -13,3 +13,7 @@ export function DeleteSnippet(arg1) {
 export function GetSnippets() {
   return window['go']['main']['App']['GetSnippets']();
 }
+
+export function UpdateSnippet(arg1) {
+  return window['go']['main']['App']['UpdateSnippet'](arg1);
+}
