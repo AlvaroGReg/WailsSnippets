@@ -4,4 +4,6 @@ import {domain} from '../models';
 
 export function CreateSnippet(arg1:domain.CreateSnippetInput):Promise<domain.Snippet>;
 
+export function DeleteSnippet(arg1:string):Promise<void>;
+
 export function GetSnippets():Promise<Array<domain.Snippet>>;

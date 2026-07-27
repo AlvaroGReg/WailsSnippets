@@ -31,12 +31,14 @@ func (s *SnippetService) List() []domain.Snippet {
 	// Devolvemos una copia para no exponer el slice interno.
 	result := make([]domain.Snippet, len(s.snippets))
 	copy(result, s.snippets)
+	log.Printf("snippet_service::List() => result:: %+v", result)
 
 	return result
 }
 
+// CREATE
 func (s *SnippetService) Create(input domain.CreateSnippetInput) (domain.Snippet, error) {
-	log.Printf("Create snippet input: %+v", input)
+	log.Printf("snippet_service::Create(input)::input %+v", input)
 
 	title := strings.TrimSpace(input.Title)
 	code := strings.TrimSpace(input.Code)
@@ -57,6 +59,7 @@ func (s *SnippetService) Create(input domain.CreateSnippetInput) (domain.Snippet
 		Tags:      input.Tags,
 		CreatedAt: time.Now().UTC().Format(time.RFC3339),
 	}
+	log.Printf("snippet_service::Create(input) => res::res %+v", snippet)
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -66,8 +69,19 @@ func (s *SnippetService) Create(input domain.CreateSnippetInput) (domain.Snippet
 	return snippet, nil
 }
 
-// second phase
-// func (s *SnippetService) DeleteSnippet(id string) error
+// DELETE
+func (s *SnippetService) DeleteSnippet(id string) error {
+	log.Printf("snippet_service::DeleteSnippet(id)::id %+v", id)
+
+	for i, value := range s.snippets {
+		if value.ID == id {
+			log.Printf("snippet_service::DeleteSnippet(id)::snippetToDelete %+v", value)
+			s.snippets = append(s.snippets[:i], s.snippets[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("No se pudo borrar el snippet")
+}
 
 // last
 // func (s *SnippetService) UpdateSnippet(snippet domain.Snippet) (domain.Snippet, error)

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CreateSnippet, GetSnippets } from "../wailsjs/go/main/App";
+import { CreateSnippet, DeleteSnippet, GetSnippets } from "../wailsjs/go/main/App";
 
 function App() {
     const [snippets, setSnippets] = useState<any[]>([]);
@@ -34,6 +34,16 @@ function App() {
         }
     }
 
+    async function deleteSnippet(id: string) {
+        try {
+            setError("");
+            const result: any = await DeleteSnippet(id);
+            await loadSnippets();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "No se pudo borrar el snippet");
+        }
+    }
+
     return (
         <main>
             <button onClick={createExample}>Crear snippet de ejemplo</button>
@@ -43,7 +53,11 @@ function App() {
             <ul>
                 {snippets.map((snippet) => (
                     <li key={snippet.id}>
-                        {snippet.title} — {snippet.language}
+                        <span>{snippet.title}</span>
+                        <span>{snippet.language}</span>
+                        <button onClick={ () => deleteSnippet(snippet.id)}>
+                            <span>Borrar</span>
+                        </button>
                     </li>
                 ))}
             </ul>

@@ -33,3 +33,7 @@ func (a *App) GetSnippets() []domain.Snippet {
 func (a *App) CreateSnippet(input domain.CreateSnippetInput) (domain.Snippet, error) {
 	return a.snippets.Create(input)
 }
+
+func (a *App) DeleteSnippet(id string) error {
+	return a.snippets.DeleteSnippet(id)
+}

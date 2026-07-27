@@ -6,6 +6,10 @@ export function CreateSnippet(arg1) {
   return window['go']['main']['App']['CreateSnippet'](arg1);
 }
 
+export function DeleteSnippet(arg1) {
+  return window['go']['main']['App']['DeleteSnippet'](arg1);
+}
+
 export function GetSnippets() {
   return window['go']['main']['App']['GetSnippets']();
 }
