@@ -2,3 +2,5 @@ build/bin
 node_modules
 frontend/dist
 .git-local
+STEPS.md
+frontend/package.json.md5
