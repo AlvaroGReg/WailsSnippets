@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "WailsTest1",
+  "outputfilename": "WailsTest1",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Álvaro Gracia Reguilón",
+    "email": "agracia@integramedia.com"
+  }
+}
