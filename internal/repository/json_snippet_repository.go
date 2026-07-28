@@ -74,6 +74,10 @@ func (r *JSONSnippetRepository) List() ([]domain.Snippet, error) {
 
 // Save file, rewritting if exists
 func (r *JSONSnippetRepository) SaveList(snippets []domain.Snippet) error {
+	if r.directory == "" {
+		return errors.New("No route selected; select folder to save snippets")
+	}
+
 	file, err := os.Create(filepath.Join(r.directory, snippetsFileName))
 	if err != nil {
 		return err

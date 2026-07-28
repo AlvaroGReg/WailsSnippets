@@ -4,3 +4,4 @@ frontend/dist
 .git-local
 STEPS.md
 frontend/package.json.md5
+snippets.json
