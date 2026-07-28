@@ -72,7 +72,7 @@ func (r *JSONSnippetRepository) List() ([]domain.Snippet, error) {
 	return snippets, nil
 }
 
-// Save is the complementary operation for when CREATE/UPDATE/DELETE are moved here.
+// Save file, rewritting if exists
 func (r *JSONSnippetRepository) SaveList(snippets []domain.Snippet) error {
 	file, err := os.Create(filepath.Join(r.directory, snippetsFileName))
 	if err != nil {

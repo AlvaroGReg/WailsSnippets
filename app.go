@@ -13,10 +13,8 @@ import (
 
 // App struct
 type App struct {
-	ctx              context.Context
-	config           domain.AppConfig
-	configRepository *repository.JSONConfigRepository
-	snippets         *service.SnippetService
+	ctx      context.Context
+	snippets *service.SnippetService
 }
 
 // NewApp creates a new App application struct
@@ -27,9 +25,8 @@ func NewApp() *App {
 		log.Printf("unable to load snippets configuration: %v", err)
 	}
 
-	snippets := service.NewSnippetService()
-	snippets.SetSnippetsDirectory(config.SnippetsDirectory)
-	return &App{config: config, configRepository: configRepository, snippets: snippets}
+	snippets := service.NewSnippetService(config, configRepository)
+	return &App{snippets: snippets}
 }
 
 // startup is called when the app starts. The context is saved
@@ -49,30 +46,15 @@ func (a *App) GetSnippets() ([]domain.Snippet, error) {
 }
 
 func (a *App) SelectSnippetsDirectory() (string, error) {
+	// TODO: Getting route is reacts work, removing the need of context and runtime imports here.
+	// move it while making the front and swap directory: string to prop instead of return
 	directory, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Chose snippets folder",
 	})
 	if err != nil {
 		return "", err
 	}
-	if directory == "" { // The native dialog was cancelled.
-		return a.snippets.SnippetsDirectory(), nil
-	}
-
-	previousDirectory := a.snippets.SnippetsDirectory()
-	a.snippets.SetSnippetsDirectory(directory)
-	if err := a.snippets.EnsureSnippetsFile(); err != nil {
-		a.snippets.SetSnippetsDirectory(previousDirectory)
-		return "", err
-	}
-	previousConfig := a.config
-	a.config.SnippetsDirectory = directory
-	if err := a.configRepository.SaveConfig(a.config); err != nil {
-		a.config = previousConfig
-		a.snippets.SetSnippetsDirectory(previousDirectory)
-		return "", err
-	}
-	return directory, nil
+	return a.snippets.SelectSnippetsDirectory(directory)
 }
 
 func (a *App) GetSnippetsStoragePath() string {
