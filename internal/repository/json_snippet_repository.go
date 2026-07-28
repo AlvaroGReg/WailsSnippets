@@ -12,19 +12,29 @@ import (
 const snippetsFileName = "snippets.json"
 
 // JSONSnippetRepository contains the basic JSON-file operations for snippets.
-type JSONSnippetRepository struct{}
+type JSONSnippetRepository struct {
+	directory string
+}
 
 func NewJSONSnippetRepository() *JSONSnippetRepository {
 	return &JSONSnippetRepository{}
 }
 
+func (r *JSONSnippetRepository) SetDirectory(directory string) {
+	r.directory = directory
+}
+
+func (r *JSONSnippetRepository) Directory() string {
+	return r.directory
+}
+
 // EnsureFile creates snippets.json only when the configured folder exists and
 // the file has not been created yet.
-func (r *JSONSnippetRepository) EnsureFile(directory string) error {
-	if directory == "" {
+func (r *JSONSnippetRepository) EnsureFile() error {
+	if r.directory == "" {
 		return errors.New("No route selected; select folder to save snippets")
 	}
-	info, err := os.Stat(directory)
+	info, err := os.Stat(r.directory)
 	if err != nil {
 		return err
 	}
@@ -32,7 +42,7 @@ func (r *JSONSnippetRepository) EnsureFile(directory string) error {
 		return errors.New("Route is not a valid folder")
 	}
 
-	path := filepath.Join(directory, snippetsFileName)
+	path := filepath.Join(r.directory, snippetsFileName)
 	if _, err = os.Stat(path); os.IsNotExist(err) {
 		if err := os.WriteFile(path, []byte("[]\n"), 0o644); err != nil {
 			return err
@@ -44,12 +54,12 @@ func (r *JSONSnippetRepository) EnsureFile(directory string) error {
 }
 
 // List only reads an existing snippets.json file.
-func (r *JSONSnippetRepository) List(directory string) ([]domain.Snippet, error) {
-	if directory == "" {
+func (r *JSONSnippetRepository) List() ([]domain.Snippet, error) {
+	if r.directory == "" {
 		return nil, errors.New("No route selected; select folder to save snippets")
 	}
 
-	file, err := os.Open(filepath.Join(directory, snippetsFileName))
+	file, err := os.Open(filepath.Join(r.directory, snippetsFileName))
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +73,8 @@ func (r *JSONSnippetRepository) List(directory string) ([]domain.Snippet, error)
 }
 
 // Save is the complementary operation for when CREATE/UPDATE/DELETE are moved here.
-func (r *JSONSnippetRepository) Save(directory string, snippets []domain.Snippet) error {
-	file, err := os.Create(filepath.Join(directory, snippetsFileName))
+func (r *JSONSnippetRepository) SaveList(snippets []domain.Snippet) error {
+	file, err := os.Create(filepath.Join(r.directory, snippetsFileName))
 	if err != nil {
 		return err
 	}
