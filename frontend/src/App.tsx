@@ -2,6 +2,7 @@ import SnippetsList from "./components/SnippetsList";
 import SearchBar from "./components/SearchBar";
 import ConfirmDialog from "./components/dialogs/ConfirmDialog";
 import ErrorDialog from "./components/dialogs/ErrorDialog";
+import SnippetEditorDialog from "./components/dialogs/SnippetEditorDialog";
 import { Button, Spinner } from "@fluentui/react-components";
 import { useSnippets } from "./hooks/use-snippets";
 import { useMemo, useState } from "react";
@@ -104,6 +105,12 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
                 message="Are you sure you want to delete this snippet?"
                 confirmLabel="Delete"
                 onClose={handleDeleteConfirmation}
+            />
+            <SnippetEditorDialog
+                open={snippetBeingEdited !== undefined}
+                snippet={snippetBeingEdited ?? undefined}
+                onClose={() => setSnippetBeingEdited(undefined)}
+                onSave={saveSnippet}
             />
             <ErrorDialog error={error} onClose={clearError} />
         </main>
