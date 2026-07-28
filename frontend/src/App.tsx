@@ -1,11 +1,12 @@
-import SnippetsTable from "./components/SnippetsTable";
+import SnippetsList from "./components/SnippetsList";
 import SearchBar from "./components/SearchBar";
 import ConfirmDialog from "./components/dialogs/ConfirmDialog";
 import ErrorDialog from "./components/dialogs/ErrorDialog";
-import { Button } from "@fluentui/react-components";
+import { Button, Spinner } from "@fluentui/react-components";
 import { useSnippets } from "./hooks/use-snippets";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AddRegular, BrightnessHighRegular, DarkThemeRegular } from "@fluentui/react-icons";
+import type { CreateSnippetInput, SnippetModel } from "./models/Snippet";
 
 type AppProps = {
     isDarkTheme: boolean;
@@ -15,10 +16,12 @@ type AppProps = {
 function App({ isDarkTheme, onToggleTheme }: AppProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [snippetPendingDeletion, setSnippetPendingDeletion] = useState<string | null>(null);
+    const [snippetBeingEdited, setSnippetBeingEdited] = useState<SnippetModel | null | undefined>(undefined);
     const {
         snippets,
         error,
         clearError,
+        isLoading,
         storagePath,
         selectStorageDirectory,
         createSnippet,
@@ -26,15 +29,27 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
         deleteSnippet,
     } = useSnippets();
 
-    function createExample() {
-        const newSnippet = {
-            title: "Sample title",
-            language: "TypeScript",
-            code: "console.log('Hello');",
-            tags: ["typescript", "sample"],
-        };
+    const filteredSnippets = useMemo(() => {
+        const query = searchQuery.trim().toLocaleLowerCase();
 
-        void createSnippet(newSnippet);
+        if (!query) {
+            return snippets;
+        }
+
+        return snippets.filter((snippet) =>
+            [snippet.title, snippet.language, snippet.code, ...snippet.tags]
+                .some((field) => field.toLocaleLowerCase().includes(query)),
+        );
+    }, [searchQuery, snippets]);
+
+    function saveSnippet(input: CreateSnippetInput) {
+        if (snippetBeingEdited) {
+            void updateSnippet({ ...snippetBeingEdited, ...input });
+        } else {
+            void createSnippet(input);
+        }
+
+        setSnippetBeingEdited(undefined);
     }
 
     function handleDeleteConfirmation(confirmed: boolean) {
@@ -53,15 +68,18 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
                     appearance="primary"
                     aria-label="Create snippet"
                     icon={<AddRegular />}
-                    onClick={createExample}
+                    onClick={() => setSnippetBeingEdited(null)}
                     title="Create snippet"
                 />
             </header>
-            {/* <SnippetsTable
-                snippets={snippets}
-                onUpdate={updateSnippet}
-                onDelete={deleteSnippet}
-            /> */}
+            {isLoading && <Spinner label="Loading snippets" />}
+            {(!isLoading || snippets.length > 0) && (
+                <SnippetsList
+                    snippets={filteredSnippets}
+                    onEdit={setSnippetBeingEdited}
+                    onDelete={setSnippetPendingDeletion}
+                />
+            )}
             <footer>
                 <Button
                     appearance="subtle"

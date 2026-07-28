@@ -10,48 +10,71 @@ export function useSnippets() {
     const [snippets, setSnippets] = useState<SnippetModel[]>([]);
     const [error, setError] = useState("");
     const [storagePath, setStoragePath] = useState("");
+    const [loadingOperations, setLoadingOperations] = useState(0);
 
     const clearError = useCallback(() => {
         setError("");
     }, []);
 
+    const startLoading = useCallback(() => {
+        setLoadingOperations((current) => current + 1);
+    }, []);
+
+    const stopLoading = useCallback(() => {
+        setLoadingOperations((current) => Math.max(0, current - 1));
+    }, []);
+
     const loadSnippets = useCallback(async () => {
+        startLoading();
         try {
             setError("");
             setSnippets(await snippetsService.getSnippets());
         } catch (error) {
             setError(getErrorMessage(error));
+        } finally {
+            stopLoading();
         }
-    }, []);
+    }, [startLoading, stopLoading]);
 
     useEffect(() => {
         void loadSnippets();
-        void snippetsService.getSnippetsStoragePath().then(setStoragePath).catch((error: unknown) => {
-            setError(getErrorMessage(error));
-        });
-    }, [loadSnippets]);
+        startLoading();
+        void snippetsService.getSnippetsStoragePath()
+            .then(setStoragePath)
+            .catch((error: unknown) => {
+                setError(getErrorMessage(error));
+            })
+            .finally(stopLoading);
+    }, [loadSnippets, startLoading, stopLoading]);
 
     const selectStorageDirectory = useCallback(async () => {
+        startLoading();
         try {
             setError("");
             setStoragePath(await snippetsService.selectSnippetsDirectory());
             await loadSnippets();
         } catch (error) {
             setError(getErrorMessage(error));
+        } finally {
+            stopLoading();
         }
-    }, [loadSnippets]);
+    }, [loadSnippets, startLoading, stopLoading]);
 
     const createSnippet = useCallback(async (input: CreateSnippetInput) => {
+        startLoading();
         try {
             setError("");
             const snippet = await snippetsService.createSnippet(input);
             setSnippets((currentSnippets) => [...currentSnippets, snippet]);
         } catch (error) {
             setError(getErrorMessage(error));
+        } finally {
+            stopLoading();
         }
-    }, []);
+    }, [startLoading, stopLoading]);
 
     const updateSnippet = useCallback(async (snippet: SnippetModel) => {
+        startLoading();
         try {
             setError("");
             const updatedSnippet = await snippetsService.updateSnippet(snippet);
@@ -62,10 +85,13 @@ export function useSnippets() {
             );
         } catch (error) {
             setError(getErrorMessage(error));
+        } finally {
+            stopLoading();
         }
-    }, []);
+    }, [startLoading, stopLoading]);
 
     const deleteSnippet = useCallback(async (id: string) => {
+        startLoading();
         try {
             setError("");
             await snippetsService.deleteSnippet(id);
@@ -74,13 +100,16 @@ export function useSnippets() {
             );
         } catch (error) {
             setError(getErrorMessage(error));
+        } finally {
+            stopLoading();
         }
-    }, []);
+    }, [startLoading, stopLoading]);
 
     return {
         snippets,
         error,
         clearError,
+        isLoading: loadingOperations > 0,
         storagePath,
         selectStorageDirectory,
         createSnippet,
