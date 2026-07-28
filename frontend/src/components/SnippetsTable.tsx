@@ -20,20 +20,17 @@ function SnippetsTable({ snippets, onUpdate, onDelete }: SnippetsTableProps) {
     }
 
     return (
-        <ul>
+        <div className="snippets-table">
             {snippets.map((snippet) => (
-                <li key={snippet.id}>
-                    <span>{snippet.title}</span>
-                    <span>{snippet.language}</span>
-                    <button onClick={() => updateExample(snippet)}>
-                        <span>Update</span>
-                    </button>
-                    <button onClick={() => onDelete(snippet.id)}>
-                        <span>Delete</span>
-                    </button>
-                </li>
+                <div key={snippet.id} className="snippet-item" onClick={() => updateExample(snippet)}>
+                    <span className="snippet-title">{snippet.title}</span>
+                    <span className="snippet-lang">{snippet.language}</span>
+                    <div className="snippet-buttons">
+                        <button onClick={() => onDelete(snippet.id)}>Delete</button>
+                    </div>
+                </div>
             ))}
-        </ul>
+        </div>
     );
 }
 

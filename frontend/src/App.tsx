@@ -1,4 +1,5 @@
-import SnippetsTable from "./components/snippets-table";
+import SnippetsTable from "./components/SnippetsTable";
+import SearchBar from "./components/SearchBar";
 import { useSnippets } from "./hooks/use-snippets";
 
 function App() {
@@ -25,21 +26,20 @@ function App() {
 
     return (
         <main>
-            <section className="storage-settings">
-                <button onClick={() => void selectStorageDirectory()}>
-                    Choose folder to save snippets
-                </button>
-                <p>{storagePath || "No folder selected."}</p>
-            </section>
-            <button onClick={createExample}>Create sample snippet</button>
-
+            <head>
+                <SearchBar></SearchBar>
+                <button onClick={createExample}>+</button>
+            </head>
             {error && <p>{error}</p>}
-
             <SnippetsTable
                 snippets={snippets}
                 onUpdate={updateSnippet}
                 onDelete={deleteSnippet}
             />
+            <footer>
+                <button onClick={() => void selectStorageDirectory()}>{storagePath || "No folder selected."}</button>
+                <button>Theme</button>
+            </footer>
         </main>
     );
 }
