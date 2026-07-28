@@ -27,7 +27,7 @@ function App() {
     return (
         <main>
             <head>
-                <SearchBar></SearchBar>
+                {/* <SearchBar></SearchBar> */}
                 <button onClick={createExample}>+</button>
             </head>
             {error && <p>{error}</p>}
