@@ -14,6 +14,14 @@ export function GetSnippets() {
   return window['go']['main']['App']['GetSnippets']();
 }
 
+export function GetSnippetsStoragePath() {
+  return window['go']['main']['App']['GetSnippetsStoragePath']();
+}
+
+export function SelectSnippetsDirectory() {
+  return window['go']['main']['App']['SelectSnippetsDirectory']();
+}
+
 export function UpdateSnippet(arg1) {
   return window['go']['main']['App']['UpdateSnippet'](arg1);
 }

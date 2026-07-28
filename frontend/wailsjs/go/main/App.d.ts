@@ -8,4 +8,8 @@ export function DeleteSnippet(arg1:string):Promise<void>;
 
 export function GetSnippets():Promise<Array<domain.Snippet>>;
 
+export function GetSnippetsStoragePath():Promise<string>;
+
+export function SelectSnippetsDirectory():Promise<string>;
+
 export function UpdateSnippet(arg1:domain.Snippet):Promise<domain.Snippet>;

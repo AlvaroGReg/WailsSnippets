@@ -9,6 +9,7 @@ function getErrorMessage(error: unknown): string {
 export function useSnippets() {
     const [snippets, setSnippets] = useState<SnippetModel[]>([]);
     const [error, setError] = useState("");
+    const [storagePath, setStoragePath] = useState("");
 
     const loadSnippets = useCallback(async () => {
         try {
@@ -21,6 +22,19 @@ export function useSnippets() {
 
     useEffect(() => {
         void loadSnippets();
+        void snippetsService.getSnippetsStoragePath().then(setStoragePath).catch((error: unknown) => {
+            setError(getErrorMessage(error));
+        });
+    }, [loadSnippets]);
+
+    const selectStorageDirectory = useCallback(async () => {
+        try {
+            setError("");
+            setStoragePath(await snippetsService.selectSnippetsDirectory());
+            await loadSnippets();
+        } catch (error) {
+            setError(getErrorMessage(error));
+        }
     }, [loadSnippets]);
 
     const createSnippet = useCallback(async (input: CreateSnippetInput) => {
@@ -59,5 +73,13 @@ export function useSnippets() {
         }
     }, []);
 
-    return { snippets, error, createSnippet, updateSnippet, deleteSnippet };
+    return {
+        snippets,
+        error,
+        storagePath,
+        selectStorageDirectory,
+        createSnippet,
+        updateSnippet,
+        deleteSnippet,
+    };
 }

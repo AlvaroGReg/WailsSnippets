@@ -2,6 +2,8 @@ import {
     CreateSnippet,
     DeleteSnippet,
     GetSnippets,
+	GetSnippetsStoragePath,
+	SelectSnippetsDirectory,
     UpdateSnippet,
 } from "../../wailsjs/go/main/App";
 import type { CreateSnippetInput, SnippetModel } from "../models/Snippet";
@@ -23,7 +25,7 @@ async function runRequest<T>(request: () => Promise<T>, errorMessage: string): P
 }
 
 export function getSnippets(): Promise<SnippetModel[]> {
-    return runRequest(GetSnippets, "Unable to load snippets.");
+    return runRequest(GetSnippets, "No hay una ruta configurada. Selecciona una carpeta de snippets.");
 }
 
 export function createSnippet(input: CreateSnippetInput): Promise<SnippetModel> {
@@ -36,4 +38,12 @@ export function updateSnippet(snippet: SnippetModel): Promise<SnippetModel> {
 
 export function deleteSnippet(id: string): Promise<void> {
     return runRequest(() => DeleteSnippet(id), "Unable to delete the snippet.");
+}
+
+export function getSnippetsStoragePath(): Promise<string> {
+    return runRequest(GetSnippetsStoragePath, "Unable to get the snippets file path.");
+}
+
+export function selectSnippetsDirectory(): Promise<string> {
+    return runRequest(SelectSnippetsDirectory, "Unable to select the snippets folder.");
 }
