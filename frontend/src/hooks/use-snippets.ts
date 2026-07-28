@@ -11,6 +11,10 @@ export function useSnippets() {
     const [error, setError] = useState("");
     const [storagePath, setStoragePath] = useState("");
 
+    const clearError = useCallback(() => {
+        setError("");
+    }, []);
+
     const loadSnippets = useCallback(async () => {
         try {
             setError("");
@@ -76,6 +80,7 @@ export function useSnippets() {
     return {
         snippets,
         error,
+        clearError,
         storagePath,
         selectStorageDirectory,
         createSnippet,

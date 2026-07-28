@@ -1,14 +1,21 @@
-import {createRoot} from 'react-dom/client'
-import './style.css'
-import App from './App'
-import { FluentProvider, webDarkTheme } from "@fluentui/react-components";
+import { createRoot } from "react-dom/client";
+import { useState } from "react";
+import "./style.css";
+import App from "./App";
+import { FluentProvider, webDarkTheme, webLightTheme } from "@fluentui/react-components";
 
-const container = document.getElementById('root')
+function Root() {
+    const [isDarkTheme, setIsDarkTheme] = useState(true);
 
-const root = createRoot(container!)
+    return (
+        <FluentProvider theme={isDarkTheme ? webDarkTheme : webLightTheme} style={{ minHeight: "100vh" }}>
+            <App
+                isDarkTheme={isDarkTheme}
+                onToggleTheme={() => setIsDarkTheme((currentTheme) => !currentTheme)}
+            />
+        </FluentProvider>
+    );
+}
 
-root.render(
-    <FluentProvider theme={webDarkTheme}>
-        <App />
-    </FluentProvider>,
-)
+const container = document.getElementById("root");
+createRoot(container!).render(<Root />);
