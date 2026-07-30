@@ -1,4 +1,25 @@
 #app {
+    * {
+        box-sizing: border-box;
+    }
+}
+
+.main-body {
+    display: flex;
+    flex-direction: column;
     height: 100vh;
-    text-align: center;
+    width: 100vw;
+
+    .main-header {
+        border-bottom: solid 1px var(--colorNeutralStroke1);
+        display: flex;
+        gap: 20px;
+        justify-content: space-between;
+        padding: 16px;
+    }
+
+    .main-footer {
+        border-top: solid 1px var(--colorNeutralStroke1);
+        padding: 3px 16px;
+    }
 }

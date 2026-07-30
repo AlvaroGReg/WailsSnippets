@@ -1,0 +1,94 @@
+.snippets-list {
+    align-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    gap: 12px;
+    overflow-y: auto;
+    padding: 16px;
+
+    .snippet-item {
+        background: var(--colorNeutralBackground1);
+        border: 1px solid var(--colorNeutralStroke1);
+        border-radius: var(--borderRadiusMedium);
+        box-shadow: var(--shadow2);
+        max-height: 220px;
+        padding: 12px;
+        width: calc(50% - 6px);
+    }
+
+    .snippet-head,
+    .snippet-subtitle {
+        align-items: center;
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+    }
+
+    .snippet-title,
+    .snippet-lang {
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        display: -webkit-box;
+        line-clamp: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .snippet-title {
+        font-weight: 600;
+    }
+
+    .snippet-subtitle {
+        color: var(--colorNeutralForeground3);
+    }
+
+    .snippet-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .snippet-code {
+        background: var(--colorNeutralBackground3);
+        border-radius: var(--borderRadiusSmall);
+        color: var(--colorNeutralForeground1);
+        font-family: Consolas, "Courier New", monospace;
+        height: 84px;
+        overflow: auto;
+        padding: 12px;
+        white-space: pre;
+    }
+
+    .snippet-tags {
+        display: flex;
+        gap: 8px;
+        list-style: none;
+        overflow-x: hidden;
+        padding: 0;
+
+        .tag-item {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            max-width: 135px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    @media (width < 720px) {
+        flex-direction: column;
+
+        .snippet-item {
+            width: 100%;
+        }
+    }
+}
+
+.snippets-list-empty {
+    color: var(--colorNeutralForeground3);
+    margin: 32px 0;
+    text-align: center;
+}

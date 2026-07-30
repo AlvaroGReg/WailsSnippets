@@ -1,5 +1,6 @@
-import SnippetsList from "./components/SnippetsList";
-import SearchBar from "./components/SearchBar";
+import './App.css';
+import SnippetsList from "./components/snippetsList/SnippetsList";
+import SearchBar from "./components/searchbar/SearchBar";
 import ConfirmDialog from "./components/dialogs/ConfirmDialog";
 import ErrorDialog from "./components/dialogs/ErrorDialog";
 import SnippetEditorDialog from "./components/dialogs/SnippetEditorDialog";
@@ -62,8 +63,8 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
     }
 
     return (
-        <main>
-            <header>
+        <main id="app" className="main-body">
+            <header className="main-header">
                 <SearchBar value={searchQuery} onChange={setSearchQuery} />
                 <Button
                     appearance="primary"
@@ -81,7 +82,7 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
                     onDelete={setSnippetPendingDeletion}
                 />
             )}
-            <footer>
+            <footer className='main-footer'>
                 <Button
                     appearance="subtle"
                     className="storage-directory-button"

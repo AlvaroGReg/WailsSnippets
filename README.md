@@ -192,6 +192,8 @@ After version 1.0, the plan includes:
 - System-tray integration for quick access to favorite snippets.
 - JSON collections: create, open, close, and switch between several snippet files, with migration from the current `snippets.json` format.
 - Syntax highlighting, a `Ctrl/Cmd + K` shortcut, import/export, SQLite, snippet-to-file export, and localization (en-es) once the MVP is stable.
+- Configurable system command to save selected text as snippet. It will use a generic title to fill needs of model.
+- Configurable system command by snippet to paste without interacting with aplication.
 
 ## License
 

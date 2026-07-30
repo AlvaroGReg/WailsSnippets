@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 import SnippetsList from "./SnippetsList";
-import { renderWithFluent } from "../test/render";
-import type { SnippetModel } from "../models/Snippet";
+import { renderWithFluent } from "../../test/render";
+import type { SnippetModel } from "../../models/Snippet";
 
 const snippet: SnippetModel = {
     id: "snippet-1",

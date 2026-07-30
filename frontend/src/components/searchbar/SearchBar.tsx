@@ -1,4 +1,5 @@
-import { Button, Input, makeStyles, tokens } from "@fluentui/react-components";
+import './SearchBar.css'
+import { Button, Input } from "@fluentui/react-components";
 import { DismissRegular, SearchRegular } from "@fluentui/react-icons";
 
 type SearchBarProps = {
@@ -6,24 +7,12 @@ type SearchBarProps = {
     onChange: (value: string) => void;
 };
 
-const useStyles = makeStyles({
-    root: {
-        width: "min(100%, 36rem)",
-    },
-    input: {
-        backgroundColor: tokens.colorNeutralBackground1,
-        borderRadius: tokens.borderRadiusMedium,
-    },
-});
-
 function SearchBar({ value, onChange }: SearchBarProps) {
-    const styles = useStyles();
-
     return (
-        <div className={styles.root}>
+        <div className="search-bar">
             <Input
                 aria-label="Search snippets"
-                className={styles.input}
+                className="search-input"
                 contentBefore={<SearchRegular aria-hidden="true" />}
                 contentAfter={value ? (
                     <Button

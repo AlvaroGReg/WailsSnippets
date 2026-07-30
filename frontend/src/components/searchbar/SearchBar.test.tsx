@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 import { useState } from "react";
 import SearchBar from "./SearchBar";
-import { renderWithFluent } from "../test/render";
+import { renderWithFluent } from "../../test/render";
 
 function SearchBarHarness({ onChange }: { onChange: (value: string) => void }) {
     const [value, setValue] = useState("");

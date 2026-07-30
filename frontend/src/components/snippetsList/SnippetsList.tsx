@@ -1,5 +1,5 @@
 import { Badge, Button, Toast, ToastTitle, Toaster, useToastController } from "@fluentui/react-components";
-import type { SnippetModel } from "../models/Snippet";
+import type { SnippetModel } from "../../models/Snippet";
 import "./SnippetsList.css";
 
 type SnippetsListProps = {
@@ -55,7 +55,7 @@ function SnippetsList({ snippets, onEdit, onDelete }: SnippetsListProps) {
                     <ul className="snippet-tags">
                         {snippet.tags.map((tag) => (
                             <li key={`${snippet.id}-${tag}`}>
-                                <Badge appearance="tint" color="brand">{tag}</Badge>
+                                <Badge appearance="tint" color="brand" className="tag-item">{tag}</Badge>
                             </li>
                         ))}
                     </ul>
