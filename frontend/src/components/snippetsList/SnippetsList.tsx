@@ -40,13 +40,13 @@ function SnippetsList({ snippets, onEdit, onDelete }: SnippetsListProps) {
                 <article key={snippet.id} className="snippet-item">
                     <div className="snippet-head">
                         <span className="snippet-title">{snippet.title}</span>
-                        <Button appearance="subtle" onClick={() => void addToClipboard(snippet.code)}>Copy</Button>
+                        <Button appearance="primary" onClick={() => void addToClipboard(snippet.code)}>Copy</Button>
                     </div>
                     <div className="snippet-subtitle">
                         <span className="snippet-lang">{snippet.language}</span>
                         <div className="snippet-actions">
-                            <Button appearance="outline" onClick={() => onDelete(snippet.id)}>Delete</Button>
-                            <Button appearance="subtle" onClick={() => onEdit(snippet)}>Edit</Button>
+                            <Button onClick={() => onDelete(snippet.id)}>Delete</Button>
+                            <Button onClick={() => onEdit(snippet)}>Edit</Button>
                         </div>
                     </div>
                     <div className="snippet-body">

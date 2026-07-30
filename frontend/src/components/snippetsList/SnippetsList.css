@@ -42,6 +42,7 @@
 
     .snippet-subtitle {
         color: var(--colorNeutralForeground3);
+        margin-block: 5px;
     }
 
     .snippet-actions {
