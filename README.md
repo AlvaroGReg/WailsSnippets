@@ -6,10 +6,7 @@ Snippets are stored in a user-selected JSON file, so data remains local and pers
 
 > A cross-platform desktop application built with Wails, Go, React, and TypeScript to manage code snippets locally with search, tags, and offline persistence.
 
-<!-- TODO: -->
 ## Screenshots
-
-Add the images under `docs/screenshots/` before publishing the project. The placeholders below identify the most useful screenshots; use PNG files, sample data, and avoid exposing personal paths.
 
 ### Main view
 
