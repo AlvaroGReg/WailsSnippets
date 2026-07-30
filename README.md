@@ -1,5 +1,7 @@
 # Snippets Dome
 
+<img src="build/appicon.png" alt="Snippets Dome icon" width="128">
+
 A desktop application for saving, finding, and reusing code snippets without relying on an account or cloud service. It is built with Wails: Go handles the application logic and disk access, while React and TypeScript provide the user interface.
 
 Snippets are stored in a user-selected JSON file, so data remains local and persists after the application is closed.
@@ -10,21 +12,15 @@ Snippets are stored in a user-selected JSON file, so data remains local and pers
 
 ### Main view
 
-<!-- TODO: Add docs/screenshots/main-view.png: list with several snippets, search box, tags, actions, and storage footer. -->
-
 ![Snippet Dome main view](docs/screenshots/main-view.png)
 
 The main screen brings together search, the create-snippet action, the results list, and the storage-folder and theme controls.
 
 ### Create or edit a snippet
 
-<!-- TODO: Add docs/screenshots/snippet-editor.png: create/edit dialog with title, language, code, and tags. -->
-
 ![Snippet editor](docs/screenshots/snippet-editor.png)
 
 ### Search and copy
-
-<!-- TODO: Add docs/screenshots/search-and-copy.png: an active search and the visual confirmation that code was copied. -->
 
 ![Searching and copying code](docs/screenshots/search-and-copy.png)
 
@@ -176,10 +172,10 @@ npm run build
 The version 1.0 goal is to finish the visual polish, manually verify the full persistence cycle, and produce a distributable binary.
 
 - [X] Implementation of tests on frontend.
-- [ ] Polish layout, spacing, hover states, and code presentation.
-- [ ] Add the screenshots referenced in this README.
+- [X] Polish layout, spacing, hover states, and code presentation.
+- [X] Add the screenshots referenced in this README.
 - [X] Verify creation, editing, deletion, search, copying, and persistence after restarting.
-- [ ] Generate and test at least one distributable binary.
+- [X] Generate and test at least one distributable binary.
 
 After version 1.0, the plan includes:
 
