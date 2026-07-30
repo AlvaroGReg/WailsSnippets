@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"WailsSnippets/internal/domain"
+	"SnippetsDome/internal/domain"
 )
 
 const configFileName = "config.json"

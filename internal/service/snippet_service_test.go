@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"WailsSnippets/internal/domain"
-	"WailsSnippets/internal/repository"
+	"SnippetsDome/internal/domain"
+	"SnippetsDome/internal/repository"
 )
 
 func newSnippetServiceWithSnippets(t *testing.T, snippets []domain.Snippet) *SnippetService {

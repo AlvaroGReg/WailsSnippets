@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"WailsSnippets/internal/domain"
+	"SnippetsDome/internal/domain"
 	"encoding/json"
 	"os"
 	"path/filepath"

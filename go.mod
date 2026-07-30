@@ -1,4 +1,4 @@
-module WailsSnippets
+module SnippetsDome
 
 go 1.25.0
 

@@ -1,4 +1,4 @@
-# Snippet Dome
+# Snippets Dome
 
 A desktop application for saving, finding, and reusing code snippets without relying on an account or cloud service. It is built with Wails: Go handles the application logic and disk access, while React and TypeScript provide the user interface.
 
@@ -139,7 +139,7 @@ The application keeps configuration separate from snippet data:
 
 | Data | Location | Contents |
 | --- | --- | --- |
-| Configuration | Operating system configuration directory, under `WailsSnippets/config.json` | Last selected folder. |
+| Configuration | Operating system configuration directory, under `SnippetsDome/config.json` | Last selected folder. |
 | Snippets | User-selected folder, in `snippets.json` | Snippet collection. |
 
 Each snippet contains an identifier, title, language, code, tags, and creation date. The JSON file can be copied as a backup; close the application before editing it manually.

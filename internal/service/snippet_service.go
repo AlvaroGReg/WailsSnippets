@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"WailsSnippets/internal/domain"
-	"WailsSnippets/internal/repository"
+	"SnippetsDome/internal/domain"
+	"SnippetsDome/internal/repository"
 )
 
 type SnippetService struct {

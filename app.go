@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"WailsSnippets/internal/domain"
-	"WailsSnippets/internal/repository"
-	"WailsSnippets/internal/service"
+	"SnippetsDome/internal/domain"
+	"SnippetsDome/internal/repository"
+	"SnippetsDome/internal/service"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -19,7 +19,7 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	configRepository := repository.NewJSONConfigRepository("WailsSnippets")
+	configRepository := repository.NewJSONConfigRepository("SnippetsDome")
 	config, err := configRepository.Load()
 	if err != nil {
 		log.Printf("unable to load snippets configuration: %v", err)

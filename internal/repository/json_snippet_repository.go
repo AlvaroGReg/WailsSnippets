@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"WailsSnippets/internal/domain"
+	"SnippetsDome/internal/domain"
 )
 
 const snippetsFileName = "snippets.json"
