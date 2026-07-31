@@ -14,6 +14,10 @@ export function DeleteSnippet(arg1) {
   return window['go']['main']['App']['DeleteSnippet'](arg1);
 }
 
+export function GetCloseToTrayEnabled() {
+  return window['go']['main']['App']['GetCloseToTrayEnabled']();
+}
+
 export function GetSnippets() {
   return window['go']['main']['App']['GetSnippets']();
 }
@@ -22,12 +26,24 @@ export function GetSnippetsStoragePath() {
   return window['go']['main']['App']['GetSnippetsStoragePath']();
 }
 
+export function GetTraySnippetLimit() {
+  return window['go']['main']['App']['GetTraySnippetLimit']();
+}
+
 export function PickExistingSnippetsFile() {
   return window['go']['main']['App']['PickExistingSnippetsFile']();
 }
 
+export function SetCloseToTrayEnabled(arg1) {
+  return window['go']['main']['App']['SetCloseToTrayEnabled'](arg1);
+}
+
 export function SetSnippetsStoragePath(arg1) {
   return window['go']['main']['App']['SetSnippetsStoragePath'](arg1);
+}
+
+export function SetTraySnippetLimit(arg1) {
+  return window['go']['main']['App']['SetTraySnippetLimit'](arg1);
 }
 
 export function UpdateSnippet(arg1) {

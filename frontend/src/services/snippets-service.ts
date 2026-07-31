@@ -1,11 +1,15 @@
 import {
 	CreateSnippet,
 	CreateSnippetsFile,
-	DeleteSnippet,
-	GetSnippets,
+    DeleteSnippet,
+    GetCloseToTrayEnabled,
+    GetSnippets,
 	GetSnippetsStoragePath,
+	GetTraySnippetLimit,
 	PickExistingSnippetsFile,
-	SetSnippetsStoragePath,
+    SetSnippetsStoragePath,
+    SetCloseToTrayEnabled,
+	SetTraySnippetLimit,
     UpdateSnippet,
 } from "../../wailsjs/go/main/App";
 import type { CreateSnippetInput, SnippetModel } from "../models/Snippet";
@@ -28,6 +32,22 @@ async function runRequest<T>(request: () => Promise<T>, errorMessage: string): P
 
 export function getSnippets(): Promise<SnippetModel[]> {
     return runRequest(GetSnippets, "No snippets file is configured. Choose a file first.");
+}
+
+export function getCloseToTrayEnabled(): Promise<boolean> {
+    return runRequest(GetCloseToTrayEnabled, "Unable to get the close-to-tray preference.");
+}
+
+export function setCloseToTrayEnabled(enabled: boolean): Promise<void> {
+    return runRequest(() => SetCloseToTrayEnabled(enabled), "Unable to save the close-to-tray preference.");
+}
+
+export function getTraySnippetLimit(): Promise<number> {
+    return runRequest(GetTraySnippetLimit, "Unable to get the tray snippet limit.");
+}
+
+export function setTraySnippetLimit(limit: number): Promise<void> {
+    return runRequest(() => SetTraySnippetLimit(limit), "Unable to save the tray snippet limit.");
 }
 
 export function createSnippet(input: CreateSnippetInput): Promise<SnippetModel> {

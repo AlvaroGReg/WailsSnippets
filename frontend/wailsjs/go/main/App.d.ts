@@ -8,12 +8,20 @@ export function CreateSnippetsFile():Promise<string>;
 
 export function DeleteSnippet(arg1:string):Promise<void>;
 
+export function GetCloseToTrayEnabled():Promise<boolean>;
+
 export function GetSnippets():Promise<Array<domain.Snippet>>;
 
 export function GetSnippetsStoragePath():Promise<string>;
 
+export function GetTraySnippetLimit():Promise<number>;
+
 export function PickExistingSnippetsFile():Promise<string>;
 
+export function SetCloseToTrayEnabled(arg1:boolean):Promise<void>;
+
 export function SetSnippetsStoragePath(arg1:string):Promise<string>;
+
+export function SetTraySnippetLimit(arg1:number):Promise<void>;
 
 export function UpdateSnippet(arg1:domain.Snippet):Promise<domain.Snippet>;

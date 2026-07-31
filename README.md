@@ -36,6 +36,8 @@ The main screen brings together search, the create-snippet action, the results l
 - Store snippets in the selected JSON file.
 - Remember the selected file across launches in the operating system configuration directory.
 - Switch between light and dark themes.
+- Optional close-to-tray behavior on Windows, configured from the Settings dialog.
+- Windows notification-area menu to open the app, copy one of five snippets, or quit completely.
 
 ## Technologies
 
@@ -132,7 +134,7 @@ The application keeps configuration separate from snippet data:
 
 | Data | Location | Contents |
 | --- | --- | --- |
-| Configuration | Operating system configuration directory, under `SnippetsDome/config.json` | Last selected file. |
+| Configuration | Operating system configuration directory, under `SnippetsDome/config.json` | Last selected file and application preferences. |
 | Snippets | User-selected JSON file | Snippet collection. |
 
 Each snippet contains an identifier, title, language, code, tags, and creation date. The JSON file can be copied as a backup; close the application before editing it manually.
@@ -169,11 +171,14 @@ npm run build
 
 ## Changelog
 
-### 1.1.0
+### 1.1.0 (in progress)
 
 - Replaced folder-based storage with a user-selected JSON file.
 - Added a React-managed file flow to open an existing collection or create a new one with a chosen name.
 - Persist the selected file path and migrate the previous folder setting to its `snippets.json` file.
+- Added a Settings dialog and an optional Windows close-to-tray flow. The notification-area menu opens SnippetsDome, copies one of five snippets, or quits the application.
+- (in progress) Add an option to start SnippetsDome automatically with the operating system.
+- (in progress) Complete cross-platform support for Windows, macOS, and Linux, including equivalent system-tray behavior where available.
 
 ### 1.0.0
 
@@ -184,14 +189,16 @@ npm run build
 
 Version 1.0 is complete. The project is now evolving with additional features:
 
-- [ ] Full compatibility with macOS and Linux.
+- [ ] Launch SnippetsDome automatically when the operating system starts.
+- [ ] Full compatibility with macOS and Linux, including system-tray support where the desktop environment provides it.
 - [ ] Quick, combinable tag filters in a collapsible sidebar.
 - [ ] Favorites, predictably sorted and accessible without opening the editor.
-- [ ] System-tray integration for quick access to favorite snippets.
+- [X] Windows system-tray integration for quick access to five snippets.
 - [X] Replace folders-based storage with files system, electing and creating JSON to manage different snippets lists if wanted.
 - [ ] Syntax highlighting, a `Ctrl/Cmd + K` shortcut, import/export, SQLite, snippet-to-file export, and localization (en-es).
 - [ ] Configurable system command to save selected text as a snippet with a generic title.
 - [ ] Configurable command for pasting a snippet without interacting with the application.
+- [ ] Priority system: assign a number to an asset that makes it appear 1st or last.
 
 ## License
 

@@ -1,9 +1,10 @@
 package domain
 
+const DefaultTraySnippetLimit = 5
+
 // AppConfig contains the preferences that are persisted between application runs.
 type AppConfig struct {
 	SnippetsFilePath string `json:"snippetsFilePath"`
-	// SnippetsDirectory preserves the previous configuration format long enough to
-	// migrate existing installations to the default snippets.json file.
-	SnippetsDirectory string `json:"snippetsDirectory,omitempty"`
+	CloseToTray      bool   `json:"closeToTray"`
+	TraySnippetLimit int    `json:"traySnippetLimit"`
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"sync"
 
 	"SnippetsDome/internal/domain"
 	"SnippetsDome/internal/repository"
@@ -13,9 +14,30 @@ import (
 
 // App struct
 type App struct {
-	ctx      context.Context
-	snippets *service.SnippetService
+	ctx           context.Context
+	snippets      *service.SnippetService
+	tray          appTray
+	runtime       appRuntime
+	quitMu        sync.RWMutex
+	quitRequested bool
 }
+
+type appTray interface {
+	start()
+	stop()
+	isSupported() bool
+}
+
+type appRuntime interface {
+	WindowHide(context.Context)
+	Quit(context.Context)
+}
+
+type wailsRuntime struct{}
+
+func (wailsRuntime) WindowHide(ctx context.Context) { runtime.WindowHide(ctx) }
+
+func (wailsRuntime) Quit(ctx context.Context) { runtime.Quit(ctx) }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
@@ -26,7 +48,9 @@ func NewApp() *App {
 	}
 
 	snippets := service.NewSnippetService(config, configRepository)
-	return &App{snippets: snippets}
+	app := &App{snippets: snippets, runtime: wailsRuntime{}}
+	app.tray = newTrayController(app)
+	return app
 }
 
 // startup is called when the app starts. The context is saved
@@ -39,6 +63,25 @@ func (a *App) startup(ctx context.Context) {
 	if err := a.snippets.EnsureSnippetsFile(); err != nil {
 		log.Printf("unable to create snippets file: %v", err)
 	}
+}
+
+func (a *App) shutdown(ctx context.Context) {
+	a.tray.stop()
+}
+
+// beforeClose hides the window only when the user has enabled close to tray.
+// Explicit exits from the tray always continue with the application shutdown.
+func (a *App) beforeClose(ctx context.Context) bool {
+	a.quitMu.RLock()
+	quitRequested := a.quitRequested
+	a.quitMu.RUnlock()
+
+	if quitRequested || !a.tray.isSupported() || !a.snippets.CloseToTrayEnabled() {
+		return false
+	}
+
+	a.runtime.WindowHide(ctx)
+	return true
 }
 
 func (a *App) GetSnippets() ([]domain.Snippet, error) {
@@ -70,6 +113,22 @@ func (a *App) GetSnippetsStoragePath() string {
 	return a.snippets.SnippetsFilePath()
 }
 
+func (a *App) GetCloseToTrayEnabled() bool {
+	return a.snippets.CloseToTrayEnabled()
+}
+
+func (a *App) SetCloseToTrayEnabled(enabled bool) error {
+	return a.snippets.SetCloseToTrayEnabled(enabled)
+}
+
+func (a *App) GetTraySnippetLimit() int {
+	return a.snippets.TraySnippetLimit()
+}
+
+func (a *App) SetTraySnippetLimit(limit int) error {
+	return a.snippets.SetTraySnippetLimit(limit)
+}
+
 func (a *App) CreateSnippet(input domain.CreateSnippetInput) (domain.Snippet, error) {
 	return a.snippets.CreateSnippet(input)
 }
@@ -80,4 +139,29 @@ func (a *App) UpdateSnippet(snippet domain.Snippet) (domain.Snippet, error) {
 
 func (a *App) DeleteSnippet(id string) error {
 	return a.snippets.DeleteSnippet(id)
+}
+
+func (a *App) showWindow() {
+	if a.ctx != nil {
+		runtime.WindowShow(a.ctx)
+	}
+}
+
+func (a *App) copySnippetToClipboard(code string) {
+	if a.ctx == nil {
+		return
+	}
+	if err := runtime.ClipboardSetText(a.ctx, code); err != nil {
+		log.Printf("unable to copy snippet from tray: %v", err)
+	}
+}
+
+func (a *App) quitFromTray() {
+	a.quitMu.Lock()
+	a.quitRequested = true
+	a.quitMu.Unlock()
+
+	if a.ctx != nil {
+		a.runtime.Quit(a.ctx)
+	}
 }

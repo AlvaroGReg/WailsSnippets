@@ -26,9 +26,6 @@ func TestSnippetServiceSetSnippetsFile(t *testing.T) {
 		if selectedFilePath != newFilePath || service.SnippetsFilePath() != newFilePath {
 			t.Errorf("selected path = %q, service path = %q, want %q", selectedFilePath, service.SnippetsFilePath(), newFilePath)
 		}
-		if configStore.config.SnippetsFilePath != newFilePath || configStore.config.SnippetsDirectory != "" {
-			t.Errorf("saved config = %#v, want snippets file %q without a directory", configStore.config, newFilePath)
-		}
 		if err := service.EnsureSnippetsFile(); err != nil {
 			t.Errorf("selected snippets file was not created: %v", err)
 		}
@@ -45,6 +42,40 @@ func TestSnippetServiceSetSnippetsFile(t *testing.T) {
 			t.Errorf("service path after rollback = %q, want %q", got, previousFilePath)
 		}
 	})
+}
+
+func TestSnippetServiceSetCloseToTrayEnabled(t *testing.T) {
+	t.Run("persists the enabled preference", func(t *testing.T) {
+		configStore := &recordingConfigRepository{}
+		service := NewSnippetService(domain.AppConfig{}, configStore)
+
+		if err := service.SetCloseToTrayEnabled(true); err != nil {
+			t.Fatalf("SetCloseToTrayEnabled() error = %v", err)
+		}
+		if !service.CloseToTrayEnabled() {
+			t.Error("CloseToTrayEnabled() = false, want true")
+		}
+		if !configStore.config.CloseToTray {
+			t.Error("saved config does not enable CloseToTray")
+		}
+	})
+
+	t.Run("restores the previous preference when saving fails", func(t *testing.T) {
+		configStore := &recordingConfigRepository{err: errors.New("save config failed")}
+		service := NewSnippetService(domain.AppConfig{CloseToTray: false}, configStore)
+
+		if err := service.SetCloseToTrayEnabled(true); err == nil {
+			t.Fatal("SetCloseToTrayEnabled() error = nil, want config save error")
+		}
+		if service.CloseToTrayEnabled() {
+			t.Error("CloseToTrayEnabled() = true after failed save, want false")
+		}
+	})
+}
+
+func TestSnippetServiceSetTraySnippetLimit(t *testing.T) {
+	// TODO: describe persistence, validation, and rollback behavior for the tray snippet limit.
+	t.Skip("TODO: implement tests for SetTraySnippetLimit")
 }
 
 type recordingConfigRepository struct {

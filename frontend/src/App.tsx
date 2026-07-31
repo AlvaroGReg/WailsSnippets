@@ -5,11 +5,13 @@ import ConfirmDialog from "./components/dialogs/ConfirmDialog";
 import ErrorDialog from "./components/dialogs/ErrorDialog";
 import SnippetEditorDialog from "./components/dialogs/SnippetEditorDialog";
 import StorageFileDialog from "./components/dialogs/StorageFileDialog";
+import SettingsDialog from "./components/dialogs/SettingsDialog";
 import { Button, Spinner } from "@fluentui/react-components";
 import { useSnippets } from "./hooks/use-snippets";
-import { useMemo, useState } from "react";
-import { AddRegular, BrightnessHighRegular, DarkThemeRegular } from "@fluentui/react-icons";
+import { useEffect, useMemo, useState } from "react";
+import { AddRegular, BrightnessHighRegular, DarkThemeRegular, SettingsRegular } from "@fluentui/react-icons";
 import type { CreateSnippetInput, SnippetModel } from "./models/Snippet";
+import * as snippetsService from "./services/snippets-service";
 
 type AppProps = {
     isDarkTheme: boolean;
@@ -21,6 +23,10 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
     const [snippetPendingDeletion, setSnippetPendingDeletion] = useState<string | null>(null);
     const [snippetBeingEdited, setSnippetBeingEdited] = useState<SnippetModel | null | undefined>(undefined);
     const [isStorageFileDialogOpen, setIsStorageFileDialogOpen] = useState(false);
+    const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+    const [closeToTrayEnabled, setCloseToTrayEnabled] = useState(false);
+    const [traySnippetLimit, setTraySnippetLimit] = useState(5);
+    const [settingsError, setSettingsError] = useState("");
     const {
         snippets,
         error,
@@ -33,6 +39,19 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
         updateSnippet,
         deleteSnippet,
     } = useSnippets();
+
+    useEffect(() => {
+        void snippetsService.getCloseToTrayEnabled()
+            .then(setCloseToTrayEnabled)
+            .catch((requestError: unknown) => {
+                setSettingsError(requestError instanceof Error ? requestError.message : "Unable to load settings.");
+            });
+        void snippetsService.getTraySnippetLimit()
+            .then(setTraySnippetLimit)
+            .catch((requestError: unknown) => {
+                setSettingsError(requestError instanceof Error ? requestError.message : "Unable to load settings.");
+            });
+    }, []);
 
     const filteredSnippets = useMemo(() => {
         const query = searchQuery.trim().toLocaleLowerCase();
@@ -65,6 +84,26 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
         setSnippetPendingDeletion(null);
     }
 
+    async function handleCloseToTrayChange(enabled: boolean) {
+        try {
+            setSettingsError("");
+            await snippetsService.setCloseToTrayEnabled(enabled);
+            setCloseToTrayEnabled(enabled);
+        } catch (requestError) {
+            setSettingsError(requestError instanceof Error ? requestError.message : "Unable to save settings.");
+        }
+    }
+
+    async function handleTraySnippetLimitChange(limit: number) {
+        try {
+            setSettingsError("");
+            await snippetsService.setTraySnippetLimit(limit);
+            setTraySnippetLimit(limit);
+        } catch (requestError) {
+            setSettingsError(requestError instanceof Error ? requestError.message : "Unable to save settings.");
+        }
+    }
+
     return (
         <main id="app" className="main-body">
             <header className="main-header">
@@ -86,6 +125,14 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
                 />
             )}
             <footer className='main-footer'>
+                <Button
+                    appearance="subtle"
+                    className="settings-button"
+                    icon={<SettingsRegular />}
+                    onClick={() => setIsSettingsDialogOpen(true)}
+                    aria-label="Open settings"
+                    title="Settings"
+                />
                 <Button
                     appearance="subtle"
                     className="storage-file-button"
@@ -128,7 +175,21 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
                     void createStorageFile();
                 }}
             />
-            <ErrorDialog error={error} onClose={clearError} />
+            <SettingsDialog
+                open={isSettingsDialogOpen}
+                closeToTrayEnabled={closeToTrayEnabled}
+                traySnippetLimit={traySnippetLimit}
+                onClose={() => setIsSettingsDialogOpen(false)}
+                onCloseToTrayChange={(enabled) => void handleCloseToTrayChange(enabled)}
+                onTraySnippetLimitChange={(limit) => void handleTraySnippetLimitChange(limit)}
+            />
+            <ErrorDialog
+                error={error || settingsError}
+                onClose={() => {
+                    clearError();
+                    setSettingsError("");
+                }}
+            />
         </main>
     );
 }

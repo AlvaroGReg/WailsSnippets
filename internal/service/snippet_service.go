@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"log"
-	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -26,10 +25,10 @@ type configRepository interface {
 }
 
 func NewSnippetService(config domain.AppConfig, configRepository configRepository) *SnippetService {
-	if config.SnippetsFilePath == "" && config.SnippetsDirectory != "" {
-		config.SnippetsFilePath = filepath.Join(config.SnippetsDirectory, "snippets.json")
-		config.SnippetsDirectory = ""
+	if config.TraySnippetLimit < 1 {
+		config.TraySnippetLimit = domain.DefaultTraySnippetLimit
 	}
+
 	snippetRepository := repository.NewJSONSnippetRepository()
 	snippetRepository.SetFilePath(config.SnippetsFilePath)
 
@@ -44,6 +43,60 @@ func (s *SnippetService) SnippetsFilePath() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.repository.FilePath()
+}
+
+// CloseToTrayEnabled reports whether closing the main window should keep the
+// application available from the system tray.
+func (s *SnippetService) CloseToTrayEnabled() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.config.CloseToTray
+}
+
+// SetCloseToTrayEnabled persists the close-to-tray preference. The previous
+// in-memory value is retained when persistence fails.
+func (s *SnippetService) SetCloseToTrayEnabled(enabled bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	previousConfig := s.config
+	s.config.CloseToTray = enabled
+	if s.configRepository == nil {
+		return nil
+	}
+	if err := s.configRepository.SaveConfig(s.config); err != nil {
+		s.config = previousConfig
+		return err
+	}
+	return nil
+}
+
+// TraySnippetLimit reports the maximum number of snippets shown in the tray menu.
+func (s *SnippetService) TraySnippetLimit() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.config.TraySnippetLimit
+}
+
+// SetTraySnippetLimit persists the maximum number of snippets shown in the tray menu.
+func (s *SnippetService) SetTraySnippetLimit(limit int) error {
+	if limit < 1 {
+		return errors.New("tray snippet limit must be greater than zero")
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	previousConfig := s.config
+	s.config.TraySnippetLimit = limit
+	if s.configRepository == nil {
+		return nil
+	}
+	if err := s.configRepository.SaveConfig(s.config); err != nil {
+		s.config = previousConfig
+		return err
+	}
+	return nil
 }
 
 func (s *SnippetService) EnsureSnippetsFile() error {
@@ -71,7 +124,6 @@ func (s *SnippetService) SetSnippetsFile(filePath string) (string, error) {
 
 	previousConfig := s.config
 	s.config.SnippetsFilePath = filePath
-	s.config.SnippetsDirectory = ""
 	if s.configRepository != nil {
 		if err := s.configRepository.SaveConfig(s.config); err != nil {
 			s.config = previousConfig

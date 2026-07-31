@@ -20,6 +20,14 @@
 
     .main-footer {
         border-top: solid 1px var(--colorNeutralStroke1);
+        display: flex;
+        gap: 4px;
         padding: 3px 16px;
+    }
+
+    .storage-file-button {
+        flex: 1;
+        justify-content: flex-start;
+        min-width: 0;
     }
 }
