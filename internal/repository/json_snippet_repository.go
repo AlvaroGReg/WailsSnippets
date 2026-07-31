@@ -9,57 +9,59 @@ import (
 	"SnippetsDome/internal/domain"
 )
 
-const snippetsFileName = "snippets.json"
-
 // JSONSnippetRepository contains the basic JSON-file operations for snippets.
 type JSONSnippetRepository struct {
-	directory string
+	filePath string
 }
 
 func NewJSONSnippetRepository() *JSONSnippetRepository {
 	return &JSONSnippetRepository{}
 }
 
-func (r *JSONSnippetRepository) SetDirectory(directory string) {
-	r.directory = directory
+func (r *JSONSnippetRepository) SetFilePath(filePath string) {
+	r.filePath = filePath
 }
 
-func (r *JSONSnippetRepository) Directory() string {
-	return r.directory
+func (r *JSONSnippetRepository) FilePath() string {
+	return r.filePath
 }
 
-// EnsureFile creates snippets.json only when the configured folder exists and
-// the file has not been created yet.
+// EnsureFile creates the configured file only when its parent directory exists.
 func (r *JSONSnippetRepository) EnsureFile() error {
-	if r.directory == "" {
-		return errors.New("No route selected; select folder to save snippets")
+	if r.filePath == "" {
+		return errors.New("no snippets file selected")
 	}
-	info, err := os.Stat(r.directory)
+
+	info, err := os.Stat(r.filePath)
+	if os.IsNotExist(err) {
+		parent, parentErr := os.Stat(filepath.Dir(r.filePath))
+		if parentErr != nil {
+			return parentErr
+		}
+		if !parent.IsDir() {
+			return errors.New("snippets file parent is not a directory")
+		}
+		if err := os.WriteFile(r.filePath, []byte("[]\n"), 0o644); err != nil {
+			return err
+		}
+		return nil
+	}
 	if err != nil {
 		return err
 	}
-	if !info.IsDir() {
-		return errors.New("Route is not a valid folder")
-	}
-
-	path := filepath.Join(r.directory, snippetsFileName)
-	if _, err = os.Stat(path); os.IsNotExist(err) {
-		if err := os.WriteFile(path, []byte("[]\n"), 0o644); err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
+	if info.IsDir() {
+		return errors.New("snippets path is not a file")
 	}
 	return nil
 }
 
-// List only reads an existing snippets.json file.
+// List only reads an existing snippets file.
 func (r *JSONSnippetRepository) List() ([]domain.Snippet, error) {
-	if r.directory == "" {
-		return nil, errors.New("No route selected; select folder to save snippets")
+	if r.filePath == "" {
+		return nil, errors.New("no snippets file selected")
 	}
 
-	file, err := os.Open(filepath.Join(r.directory, snippetsFileName))
+	file, err := os.Open(r.filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -74,11 +76,11 @@ func (r *JSONSnippetRepository) List() ([]domain.Snippet, error) {
 
 // Save file, rewritting if exists
 func (r *JSONSnippetRepository) SaveList(snippets []domain.Snippet) error {
-	if r.directory == "" {
-		return errors.New("No route selected; select folder to save snippets")
+	if r.filePath == "" {
+		return errors.New("no snippets file selected")
 	}
 
-	file, err := os.Create(filepath.Join(r.directory, snippetsFileName))
+	file, err := os.Create(r.filePath)
 	if err != nil {
 		return err
 	}

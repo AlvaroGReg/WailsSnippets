@@ -33,7 +33,7 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	if a.snippets.SnippetsDirectory() == "" {
+	if a.snippets.SnippetsFilePath() == "" {
 		return
 	}
 	if err := a.snippets.EnsureSnippetsFile(); err != nil {
@@ -45,20 +45,29 @@ func (a *App) GetSnippets() ([]domain.Snippet, error) {
 	return a.snippets.List()
 }
 
-func (a *App) SelectSnippetsDirectory() (string, error) {
-	// TODO: Getting route is reacts work, removing the need of context and runtime imports here.
-	// move it while making the front and swap directory: string to prop instead of return
-	directory, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Chose snippets folder",
+// PickExistingSnippetsFile is a thin native-dialog bridge used by React.
+func (a *App) PickExistingSnippetsFile() (string, error) {
+	return runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title:   "Choose snippets file",
+		Filters: []runtime.FileFilter{{DisplayName: "JSON files", Pattern: "*.json"}},
 	})
-	if err != nil {
-		return "", err
-	}
-	return a.snippets.SelectSnippetsDirectory(directory)
+}
+
+// CreateSnippetsFile is a thin native-dialog bridge used by React.
+func (a *App) CreateSnippetsFile() (string, error) {
+	return runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "Create snippets file",
+		DefaultFilename: "snippets.json",
+		Filters:         []runtime.FileFilter{{DisplayName: "JSON files", Pattern: "*.json"}},
+	})
+}
+
+func (a *App) SetSnippetsStoragePath(filePath string) (string, error) {
+	return a.snippets.SetSnippetsFile(filePath)
 }
 
 func (a *App) GetSnippetsStoragePath() string {
-	return a.snippets.SnippetsDirectory()
+	return a.snippets.SnippetsFilePath()
 }
 
 func (a *App) CreateSnippet(input domain.CreateSnippetInput) (domain.Snippet, error) {

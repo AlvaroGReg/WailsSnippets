@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -9,13 +11,59 @@ import (
 	"SnippetsDome/internal/repository"
 )
 
+func TestSnippetServiceSetSnippetsFile(t *testing.T) {
+	previousFilePath := filepath.Join(t.TempDir(), "previous.json")
+	newFilePath := filepath.Join(t.TempDir(), "selected.json")
+
+	t.Run("creates the selected file and persists its path", func(t *testing.T) {
+		configStore := &recordingConfigRepository{}
+		service := NewSnippetService(domain.AppConfig{SnippetsFilePath: previousFilePath}, configStore)
+
+		selectedFilePath, err := service.SetSnippetsFile(newFilePath)
+		if err != nil {
+			t.Fatalf("SetSnippetsFile() error = %v", err)
+		}
+		if selectedFilePath != newFilePath || service.SnippetsFilePath() != newFilePath {
+			t.Errorf("selected path = %q, service path = %q, want %q", selectedFilePath, service.SnippetsFilePath(), newFilePath)
+		}
+		if configStore.config.SnippetsFilePath != newFilePath || configStore.config.SnippetsDirectory != "" {
+			t.Errorf("saved config = %#v, want snippets file %q without a directory", configStore.config, newFilePath)
+		}
+		if err := service.EnsureSnippetsFile(); err != nil {
+			t.Errorf("selected snippets file was not created: %v", err)
+		}
+	})
+
+	t.Run("restores the previous path when persisting the selection fails", func(t *testing.T) {
+		configStore := &recordingConfigRepository{err: errors.New("save config failed")}
+		service := NewSnippetService(domain.AppConfig{SnippetsFilePath: previousFilePath}, configStore)
+
+		if _, err := service.SetSnippetsFile(newFilePath); err == nil {
+			t.Fatal("SetSnippetsFile() error = nil, want config save error")
+		}
+		if got := service.SnippetsFilePath(); got != previousFilePath {
+			t.Errorf("service path after rollback = %q, want %q", got, previousFilePath)
+		}
+	})
+}
+
+type recordingConfigRepository struct {
+	config domain.AppConfig
+	err    error
+}
+
+func (r *recordingConfigRepository) SaveConfig(config domain.AppConfig) error {
+	r.config = config
+	return r.err
+}
+
 func newSnippetServiceWithSnippets(t *testing.T, snippets []domain.Snippet) *SnippetService {
 	t.Helper()
 
 	// Create an isolated JSON repository for each service test.
-	directory := t.TempDir()
+	filePath := filepath.Join(t.TempDir(), "snippets.json")
 	repo := repository.NewJSONSnippetRepository()
-	repo.SetDirectory(directory)
+	repo.SetFilePath(filePath)
 	if err := repo.EnsureFile(); err != nil {
 		t.Fatalf("EnsureFile() error = %v", err)
 	}
@@ -23,7 +71,7 @@ func newSnippetServiceWithSnippets(t *testing.T, snippets []domain.Snippet) *Sni
 		t.Fatalf("SaveList() error = %v", err)
 	}
 
-	return NewSnippetService(domain.AppConfig{SnippetsDirectory: directory}, nil)
+	return NewSnippetService(domain.AppConfig{SnippetsFilePath: filePath}, nil)
 }
 
 func TestCheckValidSnippet(t *testing.T) {
@@ -211,9 +259,9 @@ func TestSnippetServiceUpdateSnippet(t *testing.T) {
 
 // DELETE
 func TestSnippetServiceDeleteSnippet(t *testing.T) {
-	directory := t.TempDir()
+	filePath := filepath.Join(t.TempDir(), "snippets.json")
 	repo := repository.NewJSONSnippetRepository()
-	repo.SetDirectory(directory)
+	repo.SetFilePath(filePath)
 
 	if err := repo.EnsureFile(); err != nil {
 		t.Fatalf("EnsureFile() error = %v", err)
@@ -227,7 +275,7 @@ func TestSnippetServiceDeleteSnippet(t *testing.T) {
 		t.Fatalf("SaveList() error = %v", err)
 	}
 
-	service := NewSnippetService(domain.AppConfig{SnippetsDirectory: directory}, nil)
+	service := NewSnippetService(domain.AppConfig{SnippetsFilePath: filePath}, nil)
 
 	if err := service.DeleteSnippet("delete"); err != nil {
 		t.Fatalf("DeleteSnippet() error = %v", err)

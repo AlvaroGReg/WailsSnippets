@@ -14,7 +14,7 @@ Snippets are stored in a user-selected JSON file, so data remains local and pers
 
 ![Snippet Dome main view](docs/screenshots/main-view.png)
 
-The main screen brings together search, the create-snippet action, the results list, and the storage-folder and theme controls.
+The main screen brings together search, the create-snippet action, the results list, and the storage-file and theme controls.
 
 ### Create or edit a snippet
 
@@ -32,9 +32,9 @@ The main screen brings together search, the create-snippet action, the results l
 - Copy code to the clipboard from each snippet.
 - Confirmation before deletion and user-facing operation errors.
 - Loading and empty-list states.
-- Choose the data folder through the native folder picker.
-- Store snippets in `snippets.json` inside the selected folder.
-- Remember the selected folder across launches in the operating system configuration directory.
+- Choose an existing JSON file or create a new one through the native file picker.
+- Store snippets in the selected JSON file.
+- Remember the selected file across launches in the operating system configuration directory.
 - Switch between light and dark themes.
 
 ## Technologies
@@ -66,7 +66,7 @@ local config.json + snippets.json
 - `internal/domain/` defines the data handled by the application (`Snippet` and configuration).
 - `internal/service/` generates identifiers and timestamps, validates title and code, and coordinates operations.
 - `internal/repository/` isolates JSON handling and filesystem paths.
-- `app.go` exposes `GetSnippets`, `CreateSnippet`, `UpdateSnippet`, `DeleteSnippet`, and folder selection to React.
+- `app.go` exposes `GetSnippets`, `CreateSnippet`, `UpdateSnippet`, `DeleteSnippet`, and file-selection bridges to React.
 - `frontend/wailsjs/` contains generated code: use it from the frontend, but do not edit it manually.
 
 ## Requirements
@@ -99,7 +99,7 @@ On Ubuntu 24.04 / WSL, use the matching WebKitGTK tag:
 wails dev -tags webkit2_41
 ```
 
-At first launch, select a folder using the button in the application footer. The app creates `snippets.json` in that folder. Cancelling the picker leaves the current folder unchanged.
+At first launch, open the file control in the application footer. Choose an existing JSON file or create a new file with the desired name. Cancelling either picker leaves the current file unchanged.
 
 ## Build
 
@@ -132,8 +132,8 @@ The application keeps configuration separate from snippet data:
 
 | Data | Location | Contents |
 | --- | --- | --- |
-| Configuration | Operating system configuration directory, under `SnippetsDome/config.json` | Last selected folder. |
-| Snippets | User-selected folder, in `snippets.json` | Snippet collection. |
+| Configuration | Operating system configuration directory, under `SnippetsDome/config.json` | Last selected file. |
+| Snippets | User-selected JSON file | Snippet collection. |
 
 Each snippet contains an identifier, title, language, code, tags, and creation date. The JSON file can be copied as a backup; close the application before editing it manually.
 
@@ -167,26 +167,31 @@ Before handing frontend changes over, also verify the production build:
 npm run build
 ```
 
+## Changelog
+
+### 1.1.0
+
+- Replaced folder-based storage with a user-selected JSON file.
+- Added a React-managed file flow to open an existing collection or create a new one with a chosen name.
+- Persist the selected file path and migrate the previous folder setting to its `snippets.json` file.
+
+### 1.0.0
+
+- Delivered the initial offline snippet manager with creation, editing, deletion, searching, copying, tags, and persisted local storage.
+- Added focused Go and frontend test coverage, visual polish, screenshots, and a distributable desktop build.
+
 ## Roadmap
 
-The version 1.0 goal is to finish the visual polish, manually verify the full persistence cycle, and produce a distributable binary.
+Version 1.0 is complete. The project is now evolving with additional features:
 
-- [X] Implementation of tests on frontend.
-- [X] Polish layout, spacing, hover states, and code presentation.
-- [X] Add the screenshots referenced in this README.
-- [X] Verify creation, editing, deletion, search, copying, and persistence after restarting.
-- [X] Generate and test at least one distributable binary.
-
-After version 1.0, the plan includes:
-
-- Full compatibility with macOS and Linux.
-- Quick, combinable tag filters in a collapsible sidebar.
-- Favorites, predictably sorted and accessible without opening the editor.
-- System-tray integration for quick access to favorite snippets.
-- JSON collections: create, open, close, and switch between several snippet files, with migration from the current `snippets.json` format.
-- Syntax highlighting, a `Ctrl/Cmd + K` shortcut, import/export, SQLite, snippet-to-file export, and localization (en-es) once the MVP is stable.
-- Configurable system command to save selected text as snippet. It will use a generic title to fill needs of model.
-- Configurable system command by snippet to paste without interacting with aplication.
+- [ ] Full compatibility with macOS and Linux.
+- [ ] Quick, combinable tag filters in a collapsible sidebar.
+- [ ] Favorites, predictably sorted and accessible without opening the editor.
+- [ ] System-tray integration for quick access to favorite snippets.
+- [X] Replace folders-based storage with files system, electing and creating JSON to manage different snippets lists if wanted.
+- [ ] Syntax highlighting, a `Ctrl/Cmd + K` shortcut, import/export, SQLite, snippet-to-file export, and localization (en-es).
+- [ ] Configurable system command to save selected text as a snippet with a generic title.
+- [ ] Configurable command for pasting a snippet without interacting with the application.
 
 ## License
 

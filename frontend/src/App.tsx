@@ -4,6 +4,7 @@ import SearchBar from "./components/searchbar/SearchBar";
 import ConfirmDialog from "./components/dialogs/ConfirmDialog";
 import ErrorDialog from "./components/dialogs/ErrorDialog";
 import SnippetEditorDialog from "./components/dialogs/SnippetEditorDialog";
+import StorageFileDialog from "./components/dialogs/StorageFileDialog";
 import { Button, Spinner } from "@fluentui/react-components";
 import { useSnippets } from "./hooks/use-snippets";
 import { useMemo, useState } from "react";
@@ -19,13 +20,15 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [snippetPendingDeletion, setSnippetPendingDeletion] = useState<string | null>(null);
     const [snippetBeingEdited, setSnippetBeingEdited] = useState<SnippetModel | null | undefined>(undefined);
+    const [isStorageFileDialogOpen, setIsStorageFileDialogOpen] = useState(false);
     const {
         snippets,
         error,
         clearError,
         isLoading,
         storagePath,
-        selectStorageDirectory,
+        pickExistingStorageFile,
+        createStorageFile,
         createSnippet,
         updateSnippet,
         deleteSnippet,
@@ -85,11 +88,11 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
             <footer className='main-footer'>
                 <Button
                     appearance="subtle"
-                    className="storage-directory-button"
-                    onClick={() => void selectStorageDirectory()}
-                    title={storagePath || "No folder selected."}
+                    className="storage-file-button"
+                    onClick={() => setIsStorageFileDialogOpen(true)}
+                    title={storagePath || "No file selected."}
                 >
-                    {storagePath || "No folder selected."}
+                    {storagePath || "No file selected."}
                 </Button>
                 <Button
                     appearance="subtle"
@@ -112,6 +115,18 @@ function App({ isDarkTheme, onToggleTheme }: AppProps) {
                 snippet={snippetBeingEdited ?? undefined}
                 onClose={() => setSnippetBeingEdited(undefined)}
                 onSave={saveSnippet}
+            />
+            <StorageFileDialog
+                open={isStorageFileDialogOpen}
+                onClose={() => setIsStorageFileDialogOpen(false)}
+                onPickExisting={() => {
+                    setIsStorageFileDialogOpen(false);
+                    void pickExistingStorageFile();
+                }}
+                onCreateNew={() => {
+                    setIsStorageFileDialogOpen(false);
+                    void createStorageFile();
+                }}
             />
             <ErrorDialog error={error} onClose={clearError} />
         </main>

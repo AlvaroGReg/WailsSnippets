@@ -4,12 +4,16 @@ import {domain} from '../models';
 
 export function CreateSnippet(arg1:domain.CreateSnippetInput):Promise<domain.Snippet>;
 
+export function CreateSnippetsFile():Promise<string>;
+
 export function DeleteSnippet(arg1:string):Promise<void>;
 
 export function GetSnippets():Promise<Array<domain.Snippet>>;
 
 export function GetSnippetsStoragePath():Promise<string>;
 
-export function SelectSnippetsDirectory():Promise<string>;
+export function PickExistingSnippetsFile():Promise<string>;
+
+export function SetSnippetsStoragePath(arg1:string):Promise<string>;
 
 export function UpdateSnippet(arg1:domain.Snippet):Promise<domain.Snippet>;

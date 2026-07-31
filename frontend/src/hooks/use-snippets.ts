@@ -47,11 +47,18 @@ export function useSnippets() {
             .finally(stopLoading);
     }, [loadSnippets, startLoading, stopLoading]);
 
-    const selectStorageDirectory = useCallback(async () => {
+    const selectStorageFile = useCallback(async (selectFile: () => Promise<string>) => {
         startLoading();
         try {
             setError("");
-            setStoragePath(await snippetsService.selectSnippetsDirectory());
+            const filePath = await selectFile();
+            if (!filePath) {
+                return;
+            }
+            if (!filePath.toLocaleLowerCase().endsWith(".json")) {
+                throw new Error("The snippets file must use the .json extension.");
+            }
+            setStoragePath(await snippetsService.setSnippetsStoragePath(filePath));
             await loadSnippets();
         } catch (error) {
             setError(getErrorMessage(error));
@@ -59,6 +66,16 @@ export function useSnippets() {
             stopLoading();
         }
     }, [loadSnippets, startLoading, stopLoading]);
+
+    const pickExistingStorageFile = useCallback(
+        () => selectStorageFile(snippetsService.pickExistingSnippetsFile),
+        [selectStorageFile],
+    );
+
+    const createStorageFile = useCallback(
+        () => selectStorageFile(snippetsService.createSnippetsFile),
+        [selectStorageFile],
+    );
 
     const createSnippet = useCallback(async (input: CreateSnippetInput) => {
         startLoading();
@@ -111,7 +128,8 @@ export function useSnippets() {
         clearError,
         isLoading: loadingOperations > 0,
         storagePath,
-        selectStorageDirectory,
+        pickExistingStorageFile,
+        createStorageFile,
         createSnippet,
         updateSnippet,
         deleteSnippet,

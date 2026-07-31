@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"log"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -17,12 +18,20 @@ type SnippetService struct {
 	mu               sync.RWMutex
 	repository       *repository.JSONSnippetRepository
 	config           domain.AppConfig
-	configRepository *repository.JSONConfigRepository
+	configRepository configRepository
 }
 
-func NewSnippetService(config domain.AppConfig, configRepository *repository.JSONConfigRepository) *SnippetService {
+type configRepository interface {
+	SaveConfig(domain.AppConfig) error
+}
+
+func NewSnippetService(config domain.AppConfig, configRepository configRepository) *SnippetService {
+	if config.SnippetsFilePath == "" && config.SnippetsDirectory != "" {
+		config.SnippetsFilePath = filepath.Join(config.SnippetsDirectory, "snippets.json")
+		config.SnippetsDirectory = ""
+	}
 	snippetRepository := repository.NewJSONSnippetRepository()
-	snippetRepository.SetDirectory(config.SnippetsDirectory)
+	snippetRepository.SetFilePath(config.SnippetsFilePath)
 
 	return &SnippetService{
 		repository:       snippetRepository,
@@ -31,16 +40,10 @@ func NewSnippetService(config domain.AppConfig, configRepository *repository.JSO
 	}
 }
 
-func (s *SnippetService) SetSnippetsDirectory(directory string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.repository.SetDirectory(directory)
-}
-
-func (s *SnippetService) SnippetsDirectory() string {
+func (s *SnippetService) SnippetsFilePath() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.repository.Directory()
+	return s.repository.FilePath()
 }
 
 func (s *SnippetService) EnsureSnippetsFile() error {
@@ -49,34 +52,35 @@ func (s *SnippetService) EnsureSnippetsFile() error {
 	return s.repository.EnsureFile()
 }
 
-// SelectSnippetsDirectory changes the snippets directory and persists the
-// selection. If either operation fails, it restores the previous directory.
-// An empty directory means the native selection dialog was cancelled.
-func (s *SnippetService) SelectSnippetsDirectory(directory string) (string, error) {
+// SetSnippetsFile changes the snippets file and persists the selection. If
+// either operation fails, it restores the previous path.
+func (s *SnippetService) SetSnippetsFile(filePath string) (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// TODO: directory is a must coming from frontend and "" will not be posible here
-	if directory == "" {
-		return s.repository.Directory(), nil
+	if filePath == "" {
+		return "", errors.New("no snippets file selected")
 	}
 
-	previousDirectory := s.repository.Directory()
-	s.repository.SetDirectory(directory)
+	previousFilePath := s.repository.FilePath()
+	s.repository.SetFilePath(filePath)
 	if err := s.repository.EnsureFile(); err != nil {
-		s.repository.SetDirectory(previousDirectory)
+		s.repository.SetFilePath(previousFilePath)
 		return "", err
 	}
 
 	previousConfig := s.config
-	s.config.SnippetsDirectory = directory
-	if err := s.configRepository.SaveConfig(s.config); err != nil {
-		s.config = previousConfig
-		s.repository.SetDirectory(previousDirectory)
-		return "", err
+	s.config.SnippetsFilePath = filePath
+	s.config.SnippetsDirectory = ""
+	if s.configRepository != nil {
+		if err := s.configRepository.SaveConfig(s.config); err != nil {
+			s.config = previousConfig
+			s.repository.SetFilePath(previousFilePath)
+			return "", err
+		}
 	}
 
-	return directory, nil
+	return filePath, nil
 }
 
 // GET

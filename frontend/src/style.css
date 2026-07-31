@@ -29,7 +29,7 @@ footer {
     gap: 16px;
     padding: 16px;
 
-    .storage-directory-button {
+    .storage-file-button {
         min-width: 0;
         max-width: calc(100% - 56px);
         overflow: hidden;

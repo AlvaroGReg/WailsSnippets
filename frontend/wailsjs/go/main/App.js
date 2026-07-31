@@ -6,6 +6,10 @@ export function CreateSnippet(arg1) {
   return window['go']['main']['App']['CreateSnippet'](arg1);
 }
 
+export function CreateSnippetsFile() {
+  return window['go']['main']['App']['CreateSnippetsFile']();
+}
+
 export function DeleteSnippet(arg1) {
   return window['go']['main']['App']['DeleteSnippet'](arg1);
 }
@@ -18,8 +22,12 @@ export function GetSnippetsStoragePath() {
   return window['go']['main']['App']['GetSnippetsStoragePath']();
 }
 
-export function SelectSnippetsDirectory() {
-  return window['go']['main']['App']['SelectSnippetsDirectory']();
+export function PickExistingSnippetsFile() {
+  return window['go']['main']['App']['PickExistingSnippetsFile']();
+}
+
+export function SetSnippetsStoragePath(arg1) {
+  return window['go']['main']['App']['SetSnippetsStoragePath'](arg1);
 }
 
 export function UpdateSnippet(arg1) {
